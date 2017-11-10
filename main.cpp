@@ -25,6 +25,7 @@ public:
     vector<vector<int>> board_matrix;
     vector<Snake*> snakes;
     GameBoard(int);
+    void spawn_snake();
     void draw();
     void input();
     void logic();
@@ -40,7 +41,7 @@ public:
     int length;
     int speed_x;
     int speed_y;
-    Snake(GameBoard);
+    Snake(GameBoard*);
     deque<vector<int>> tail;
     void move();
 };
@@ -79,8 +80,13 @@ void GameBoard::draw() {
         }
         cout << endl;
     }
-//    cout << "snake position: \nx: " << this->snakes[0]->head_x << " y:"<< this->snakes[0]->head_y;
-    cout << "\n\nilosc graczy: " << this->snakes.size() << endl;
+    cout << "\n\nsnake position: \nx: " << this->snakes[0]->head_x << " y:"<< this->snakes[0]->head_y;
+    cout << "\nilosc graczy: " << this->snakes.size() << endl;
+}
+
+
+void GameBoard::spawn_snake() {
+    this->snakes.push_back(new Snake(this));
 }
 
 
@@ -89,6 +95,9 @@ void GameBoard::input() {
 }
 
 void GameBoard::logic() {
+    for (Snake* snake: this->snakes) {
+        snake->move();
+    }
 
 }
 
@@ -98,6 +107,8 @@ void GameBoard::flush() {
         for (int x = 0; x < this->size; x++) {
             if (x == 0  || y == 0 || y == this->size-1 || x == this->size-1) {
                 this->board_matrix[x][y] = 5;
+            } else {
+                this->board_matrix[x][y] = 0;
             }
         }
     }
@@ -109,12 +120,12 @@ void GameBoard::flush() {
 }
 
 
-Snake::Snake(GameBoard board) {
-    this->head_x = 1 + rand() % board.size-2;
-    this->head_x = 1 + rand() % board.size-2;
+Snake::Snake(GameBoard* board) {
+    this->head_x = 1 + (rand() % (board->size-2));
+    this->head_y = 1 + (rand() % (board->size-2));
     this->speed_x = 1;
     this->speed_y = 0;
-    board.snakes.push_back(this);
+    this->length = 1;
 }
 
 
@@ -134,7 +145,10 @@ void Snake::move() {
 
 int main(int argc, char* argv[]) {
     GameBoard game(20);
-    Snake snake1(game);
+    game.spawn_snake();
+
+    srand( time( NULL ) );
+
 
 
     while (true) {
