@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/snake_multiplayer.dir/main.cpp.o  -o snake_multiplayer 
