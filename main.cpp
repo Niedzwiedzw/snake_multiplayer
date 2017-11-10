@@ -1,25 +1,50 @@
 #include <iostream>
 #include <string>
+#include <stdlib.h>
 
 using namespace std;
-class GameWindow {
+class GameBoard {
 public:
     int width;
     int height;
-    GameWindow(int, int);
+    GameBoard(int, int);
+    void draw();
+    void input();
+
+
 };
 
-GameWindow::GameWindow(int width, int height) {
+GameBoard::GameBoard(int width, int height) {
     this->width = width;
     this->height = height;
 }
 
+void GameBoard::draw() {
+    system("clear");
+    for (int y = 0; y < this->height; y++) {
+        for (int x = 0; x < this->width; x++) {
+            cout << "# ";
+        }
+        cout << endl;
+    }
+
+}
 
 
-int main() {
-    GameWindow game(500, 500);
+void GameBoard::input() {
 
-    cout << game.height << game.width;
+}
+
+
+
+
+
+int main(int argc, char* argv[]) {
+    GameBoard game(20, 20);
+    while (true) {
+        game.draw();
+
+    }
 
 
     return 0;
