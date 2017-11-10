@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <vector>
+#include <deque>
 
 using namespace std;
 
@@ -12,25 +13,25 @@ char UP = 'w';
 char DOWN = 's';
 char LEFT = 'a';
 char RIGHT = 'd';
+int TICK = 2000000;
 
 
 //Board
-
 class Snake;
 class GameBoard;
 class GameBoard {
 public:
     int size;
     vector<vector<int>> board_matrix;
-    vector<Snake> snakes;
+    vector<Snake*> snakes;
     GameBoard(int);
     void draw();
     void input();
     void logic();
     void flush();
-
-
 };
+
+
 //Snake
 class Snake {
 public:
@@ -40,9 +41,10 @@ public:
     int speed_x;
     int speed_y;
     Snake(GameBoard);
-    vector<vector<int>> tail;
+    deque<vector<int>> tail;
     void move();
 };
+
 
 GameBoard::GameBoard(int size) {
     this->size = size;
@@ -54,8 +56,6 @@ GameBoard::GameBoard(int size) {
         this->board_matrix.push_back(row);
     }
 }
-
-
 
 
 void GameBoard::draw() {
@@ -75,11 +75,12 @@ void GameBoard::draw() {
                     break;
                 default: print_buffor = ' ';
             }
-
             cout << print_buffor << " ";
         }
         cout << endl;
     }
+//    cout << "snake position: \nx: " << this->snakes[0]->head_x << " y:"<< this->snakes[0]->head_y;
+    cout << "\n\nilosc graczy: " << this->snakes.size() << endl;
 }
 
 
@@ -91,6 +92,7 @@ void GameBoard::logic() {
 
 }
 
+
 void GameBoard::flush() {
     for (int y = 0; y < this->size; y++) {
         for (int x = 0; x < this->size; x++) {
@@ -99,9 +101,12 @@ void GameBoard::flush() {
             }
         }
     }
+    for (Snake* snake: this->snakes) {
+        for (vector<int> block: snake->tail) {
+            this->board_matrix[block[0]][block[1]] = 1;
+        }
+    }
 }
-
-
 
 
 Snake::Snake(GameBoard board) {
@@ -116,12 +121,20 @@ Snake::Snake(GameBoard board) {
 void Snake::move() {
     this->head_x = this->head_x + this->speed_x;
     this->head_y = this->head_y + this->speed_y;
-}
+    vector<int> head;
 
+    head.push_back(this->head_x);
+    head.push_back(this->head_y);
+    this->tail.push_front(head);
+    if (this->tail.size() > this->length) {
+        this->tail.pop_back();
+    }
+}
 
 
 int main(int argc, char* argv[]) {
     GameBoard game(20);
+    Snake snake1(game);
 
 
     while (true) {
@@ -129,10 +142,8 @@ int main(int argc, char* argv[]) {
         game.input();
         game.logic();
         game.draw();
-        usleep(20000);
+        usleep(TICK);
     }
-
-
 
     return 0;
 }
