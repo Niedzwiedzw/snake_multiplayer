@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#include <curses.h>
+
 
 
 
@@ -198,7 +198,6 @@ vector<int> GameBoard::random_free_pos() {
 
 
 int main(int argc, char* argv[]) {
-    initscr();
     GameBoard game(20);
     game.spawn_snake();
     game.spawn_apple();
