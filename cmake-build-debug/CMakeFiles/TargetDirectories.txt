@@ -1,3 +1,0 @@
-/home/niedzwiedzwo/CLionProjects/snake_multiplayer/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/niedzwiedzwo/CLionProjects/snake_multiplayer/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/niedzwiedzwo/CLionProjects/snake_multiplayer/cmake-build-debug/CMakeFiles/snake_multiplayer.dir
