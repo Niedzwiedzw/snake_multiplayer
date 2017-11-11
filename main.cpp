@@ -4,8 +4,12 @@
 #include <unistd.h>
 #include <vector>
 #include <deque>
+#include <ctime>
 
 using namespace std;
+
+#include <curses.h>
+
 
 
 //constants
@@ -13,23 +17,29 @@ char UP = 'w';
 char DOWN = 's';
 char LEFT = 'a';
 char RIGHT = 'd';
-int TICK = 2000000;
+int TICK = 200000;
 
 
 //Board
 class Snake;
 class GameBoard;
+class Apple;
 class GameBoard {
 public:
     int size;
     vector<vector<int>> board_matrix;
     vector<Snake*> snakes;
+    vector<Apple*> apples;
+
     GameBoard(int);
-    void spawn_snake();
     void draw();
     void input();
     void logic();
     void flush();
+
+    void spawn_snake();
+    void spawn_apple();
+    vector<int> random_free_pos();
 };
 
 
@@ -47,6 +57,14 @@ public:
 };
 
 
+class Apple {
+public:
+    int pos_x;
+    int pos_y;
+    GameBoard* game;
+    Apple(GameBoard*);
+};
+
 GameBoard::GameBoard(int size) {
     this->size = size;
     for (int x = 0; x < this->size; x++) {
@@ -57,6 +75,7 @@ GameBoard::GameBoard(int size) {
         this->board_matrix.push_back(row);
     }
 }
+
 
 
 void GameBoard::draw() {
@@ -89,6 +108,10 @@ void GameBoard::spawn_snake() {
     this->snakes.push_back(new Snake(this));
 }
 
+void GameBoard::spawn_apple() {
+    this->apples.push_back(new Apple(this));
+}
+
 
 void GameBoard::input() {
 
@@ -117,16 +140,24 @@ void GameBoard::flush() {
             this->board_matrix[block[0]][block[1]] = 1;
         }
     }
+
+    for (Apple* apple: this->apples) {
+        this->board_matrix[apple->pos_x][apple->pos_y] = 4;
+    }
 }
 
 
 Snake::Snake(GameBoard* board) {
-    this->head_x = 1 + (rand() % (board->size-2));
-    this->head_y = 1 + (rand() % (board->size-2));
+    srand( (unsigned int)time(nullptr) );
+    vector<int> free_pos = board->random_free_pos();
+    this->head_x = free_pos[0];
+    this->head_y = 1 + free_pos[1];
     this->speed_x = 1;
     this->speed_y = 0;
     this->length = 1;
 }
+
+
 
 
 void Snake::move() {
@@ -142,13 +173,35 @@ void Snake::move() {
     }
 }
 
+Apple::Apple(GameBoard* game) {
+    this->game = game;
+    vector<int> free_pos = game->random_free_pos();
+    this->pos_x = free_pos[0];
+    this->pos_y = free_pos[1];
+}
+
+vector<int> GameBoard::random_free_pos() {
+    while (true) {
+        srand( (unsigned int)time(nullptr) );
+
+        int pos_x = 1 + (rand() % (this->size-2));
+        int pos_y = 1 + (rand() % (this->size-2));
+
+        vector<int> free_pos;
+        free_pos.push_back(pos_x);
+        free_pos.push_back(pos_y);
+
+        return free_pos;
+    }
+}
+
+
 
 int main(int argc, char* argv[]) {
+    initscr();
     GameBoard game(20);
     game.spawn_snake();
-
-    srand( time( NULL ) );
-
+    game.spawn_apple();
 
 
     while (true) {
