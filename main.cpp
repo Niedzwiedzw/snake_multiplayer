@@ -96,12 +96,17 @@ void GameBoard::draw() {
                     break;
                 default: print_buffor = ' ';
             }
-            cout << print_buffor << " ";
+//            cout << print_buffor << " ";
+            printw(&print_buffor);
+            refresh();
         }
-        cout << endl;
+//        cout << endl;
+        char newline = '\n';
+        printw(&newline);
+        refresh();
     }
-    cout << "\n\nsnake position: \nx: " << this->snakes[0]->head_x << " y:"<< this->snakes[0]->head_y;
-    cout << "\nilosc graczy: " << this->snakes.size() << endl;
+//    cout << "\n\nsnake position: \nx: " << this->snakes[0]->head_x << " y:"<< this->snakes[0]->head_y;
+//    cout << "\nilosc graczy: " << this->snakes.size() << endl;
 }
 
 
@@ -113,12 +118,24 @@ void GameBoard::spawn_apple() {
     this->apples.push_back(new Apple(this));
 }
 
+int kbhit() {
+    int ch = getch();
+    if (ch != ERR) {
+        ungetch(ch);
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 void GameBoard::input() {
-    if (getch()=='w'){
-        cout << "W";
+    if (kbhit()) {
+        cout << getch();
+        refresh();
+    } else {
+        refresh();
+        sleep(1);
     }
-
 }
 
 void GameBoard::logic() {
@@ -202,6 +219,11 @@ vector<int> GameBoard::random_free_pos() {
 
 
 int main(int argc, char* argv[]) {
+    initscr();
+//    cbreak();
+//    noecho();
+//    nodelay(stdscr, true);
+//    scrollok(stdscr, false);
     GameBoard game(20);
     game.spawn_snake();
     game.spawn_apple();
@@ -210,7 +232,7 @@ int main(int argc, char* argv[]) {
     while (true) {
         game.flush();
         game.input();
-        game.logic();
+//        game.logic();
         game.draw();
         usleep(TICK);
     }
