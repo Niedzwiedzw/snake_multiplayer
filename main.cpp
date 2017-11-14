@@ -5,6 +5,7 @@
 #include <vector>
 #include <deque>
 #include <ctime>
+#include <ncurses.h>
 
 using namespace std;
 
@@ -114,6 +115,9 @@ void GameBoard::spawn_apple() {
 
 
 void GameBoard::input() {
+    if (getch()=='w'){
+        cout << "W";
+    }
 
 }
 
