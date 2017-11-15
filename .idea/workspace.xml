@@ -12,11 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2dabb2c9-b281-4d21-bc1a-4212aa9db9ef" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/snake_multiplayer.dir/flags.make" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/snake_multiplayer.dir/flags.make" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/snake_multiplayer.dir/link.txt" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/snake_multiplayer.dir/link.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,20 +29,30 @@
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="153">
-              <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+              <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="271">
-              <caret line="163" column="53" lean-forward="true" selection-start-line="163" selection-start-column="53" selection-end-line="163" selection-end-column="53" />
+              <caret line="163" column="53" lean-forward="false" selection-start-line="163" selection-start-column="53" selection-end-line="163" selection-end-column="53" />
               <folding>
                 <element signature="e#1#20#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="9" lean-forward="true" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -120,6 +127,7 @@
       <list>
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -209,7 +217,7 @@
       <updated>1510324882346</updated>
       <workItem from="1510324883662" duration="24281000" />
       <workItem from="1510686914349" duration="6032000" />
-      <workItem from="1510695903029" duration="9366000" />
+      <workItem from="1510695903029" duration="9458000" />
     </task>
     <task id="LOCAL-00001" summary="drawing the board">
       <created>1510333749340</created>
@@ -253,11 +261,18 @@
       <option name="project" value="LOCAL" />
       <updated>1510694220811</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="ok the snake game is fully functional, next step is multiplayer">
+      <created>1510705295722</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1510705295722</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="42304000" />
+    <option name="totallyTimeSpent" value="42396000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="72" width="1292" height="1004" extended-state="0" />
@@ -294,7 +309,8 @@
     <MESSAGE value="definitely not the working state yet, if my boss is seeing this please dont fire me" />
     <MESSAGE value="still not working as intended" />
     <MESSAGE value="not even close to working, huge regression after introducing ncurses..." />
-    <option name="LAST_COMMIT_MESSAGE" value="not even close to working, huge regression after introducing ncurses..." />
+    <MESSAGE value="ok the snake game is fully functional, next step is multiplayer" />
+    <option name="LAST_COMMIT_MESSAGE" value="ok the snake game is fully functional, next step is multiplayer" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -460,7 +476,7 @@
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
-          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -468,10 +484,18 @@
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="271">
-          <caret line="163" column="53" lean-forward="true" selection-start-line="163" selection-start-column="53" selection-end-line="163" selection-end-column="53" />
+          <caret line="163" column="53" lean-forward="false" selection-start-line="163" selection-start-column="53" selection-end-line="163" selection-end-column="53" />
           <folding>
             <element signature="e#1#20#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="9" lean-forward="true" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
+          <folding />
         </state>
       </provider>
     </entry>
