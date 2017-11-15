@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/snake_multiplayer.dir/main.cpp.o  -o snake_multiplayer 
+/usr/bin/c++   -std=c++11 -lncurses -g   CMakeFiles/snake_multiplayer.dir/main.cpp.o  -o snake_multiplayer 
