@@ -1,12 +1,13 @@
 
 #include <iostream>
-#include <string>
-#include <cstdlib>
 #include <unistd.h>
 #include <vector>
 #include <deque>
-#include <ctime>
 #include <ncurses.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 using namespace std;
 
@@ -24,6 +25,77 @@ int TICK = 200000;
 class Snake;
 class GameBoard;
 class Apple;
+class Server {
+public:
+    Server(GameBoard*);
+    GameBoard* gameBoard;
+    void keepConnection();
+    char str[100];
+    int listen_fd;
+    int comm_fd;
+    struct sockaddr_in servaddr;
+};
+
+Server::Server(GameBoard* game) {
+    this->gameBoard = game;
+    this->listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    bzero( &this->servaddr, sizeof(this->servaddr));
+
+    this->servaddr.sin_family = AF_INET;
+    this->servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+    this->servaddr.sin_port = htons(22000);
+
+    bind(this->listen_fd, (struct sockaddr *) &this->servaddr, sizeof(this->servaddr));
+
+    listen(this->listen_fd, 10);
+
+    this->comm_fd = accept(this->listen_fd, (struct sockaddr*) NULL, NULL);
+}
+
+void Server::keepConnection() {
+    bzero( str, 100);
+
+    read(this->comm_fd,str,100);
+
+    printf("Echoing back - %s",str);
+
+    write(this->comm_fd, str, strlen(str)+1);
+}
+
+class Client {
+public:
+    Client();
+    void keepConnection();
+    int sockfd;
+    int n;
+    char sendline[100];
+    char recvline[100];
+    struct sockaddr_in servaddr;
+};
+
+Client::Client() {
+    this->sockfd=socket(AF_INET,SOCK_STREAM,0);
+    bzero(&this->servaddr,sizeof this->servaddr);
+
+    this->servaddr.sin_family=AF_INET;
+    this->servaddr.sin_port=htons(22000);
+
+    inet_pton(AF_INET,"127.0.0.1",&(this->servaddr.sin_addr));
+
+    connect(this->sockfd,(struct sockaddr *)&this->servaddr,sizeof(this->servaddr));
+}
+
+void Client::keepConnection() {
+    bzero(this->sendline, 100);
+    bzero(this->recvline, 100);
+    fgets(this->sendline, 100, stdin); /*stdin = 0 , for standard input */
+
+    write(this->sockfd, this->sendline, strlen(this->sendline)+1);
+    read(this->sockfd, this->recvline,100);
+    printf("%s", this->recvline);
+}
+
 class GameBoard {
 public:
     int size;
@@ -150,7 +222,7 @@ void GameBoard::input() {
     nodelay(stdscr, true);
     scrollok(stdscr, false);
     if (kbhit()) {
-        if (getch()==27){
+        if (getch() == 27){
             getch();
             switch(getch()) {
                 case UP:
@@ -296,20 +368,51 @@ vector<int> GameBoard::random_free_pos() {
 
 
 int main(int argc, char* argv[]) {
-    initscr();
-
-    GameBoard game(20);
-    game.spawn_snake();
-    game.spawn_apple();
-
+    int gamemode = -1;
 
     while (true) {
-        game.flush();
-        game.input();
-        game.logic();
-        game.draw();
-        usleep(TICK);
+        cout << "Wybierz tryb rozgrywki\n\n\n1 - serwer\n2 - klient\n\n >> ";
+        cin >> gamemode;
+        if (gamemode != 1 && gamemode != 2) {
+            cout << "Niepoprawny wybor...\n\n";
+        } else {
+            break;
+        }
     }
+
+
+//    initscr();
+
+    GameBoard game(20);
+//    game.spawn_snake();
+//    game.spawn_apple();
+
+    if (gamemode == 1) {
+        Server server(&game);
+        while (true) {
+//            game.flush();
+//
+//            game.input();
+//            game.logic();
+//            game.draw();
+//            usleep(TICK);
+            server.keepConnection();
+        }
+    } else {
+        Client client;
+        while (true) {
+//            game.flush();
+//            game.input();
+//            game.logic();
+//            game.draw();
+//            usleep(TICK);
+            client.keepConnection();
+        }
+    }
+
+
+
+
 
     return 0;
 }
