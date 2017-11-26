@@ -8,8 +8,11 @@
 #include <netdb.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <thread>
 
 using namespace std;
+
+
 
 
 //constants
@@ -20,6 +23,27 @@ constexpr int DOWN = 67;
 
 int TICK = 200000;
 
+// Returns true on success, or false if there was an error
+//bool setSocketBlockingEnabled(int fd, bool blocking) {
+//    int flags = fcntl(fd, F_GETFL, 0);
+//    if (flags < 0) return false;
+//    flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+//    return fcntl(fd, F_SETFL, flags) == 0;
+//
+//}
+int kbhit() {
+    cbreak();
+    noecho();
+    nodelay(stdscr, true);
+    scrollok(stdscr, false);
+    int ch = getch();
+    if (ch != ERR) {
+        ungetch(ch);
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 //Board
 class Snake;
@@ -39,6 +63,7 @@ public:
 Server::Server(GameBoard* game) {
     this->gameBoard = game;
     this->listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+//    setSocketBlockingEnabled(this->listen_fd, false);
 
     bzero( &this->servaddr, sizeof(this->servaddr));
 
@@ -50,32 +75,36 @@ Server::Server(GameBoard* game) {
 
     listen(this->listen_fd, 10);
 
-    this->comm_fd = accept(this->listen_fd, (struct sockaddr*) NULL, NULL);
+    this->comm_fd = accept(this->listen_fd, (struct sockaddr*) nullptr, nullptr);
 }
 
 void Server::keepConnection() {
-    bzero( str, 100);
+    while (true) {
+        bzero(str, 100);
 
-    read(this->comm_fd,str,100);
+        read(this->comm_fd, str, 100);
 
-    printf("Echoing back - %s",str);
+        printf("Echoing back - %s", str);
 
-    write(this->comm_fd, str, strlen(str)+1);
+        write(this->comm_fd, str, strlen(str) + 1);
+
+    }
 }
 
 class Client {
 public:
     Client();
-    void keepConnection();
+    void keepConnection(GameBoard* game);
     int sockfd;
     int n;
-    char sendline[100];
+    char sendline;
     char recvline[100];
     struct sockaddr_in servaddr;
 };
 
 Client::Client() {
     this->sockfd=socket(AF_INET,SOCK_STREAM,0);
+//    setSocketBlockingEnabled(this->sockfd, false);
     bzero(&this->servaddr,sizeof this->servaddr);
 
     this->servaddr.sin_family=AF_INET;
@@ -86,14 +115,26 @@ Client::Client() {
     connect(this->sockfd,(struct sockaddr *)&this->servaddr,sizeof(this->servaddr));
 }
 
-void Client::keepConnection() {
-    bzero(this->sendline, 100);
-    bzero(this->recvline, 100);
-    fgets(this->sendline, 100, stdin); /*stdin = 0 , for standard input */
+void Client::keepConnection(GameBoard* game) {
+    cbreak();
+    noecho();
+    nodelay(stdscr, true);
+    scrollok(stdscr, false);
+    while(true) {
+        if (kbhit()) {
+            if (getch() == 27){
+                getch();
+                this->sendline = (char)getch();
+            }
+            refresh();
+        } else {
+            refresh();
+        }
 
-    write(this->sockfd, this->sendline, strlen(this->sendline)+1);
-    read(this->sockfd, this->recvline,100);
-    printf("%s", this->recvline);
+        write(this->sockfd, &this->sendline, 1);
+        read(this->sockfd, this->recvline,100);
+        printf("%s", this->recvline);
+    }
 }
 
 class GameBoard {
@@ -200,20 +241,6 @@ void GameBoard::spawn_apple() {
     this->apples.push_back(new Apple(this));
 }
 
-int kbhit() {
-    cbreak();
-    noecho();
-    nodelay(stdscr, true);
-    scrollok(stdscr, false);
-    int ch = getch();
-    if (ch != ERR) {
-        ungetch(ch);
-        return 1;
-    } else {
-        return 0;
-    }
-}
-
 void GameBoard::input() {
 
 
@@ -261,6 +288,9 @@ void GameBoard::input() {
 //        sleep(1);
     }
 }
+
+
+
 
 void GameBoard::logic() {
     for (Snake* snake: this->snakes) {
@@ -367,6 +397,9 @@ vector<int> GameBoard::random_free_pos() {
 
 
 
+
+
+
 int main(int argc, char* argv[]) {
     int gamemode = -1;
 
@@ -389,25 +422,21 @@ int main(int argc, char* argv[]) {
 
     if (gamemode == 1) {
         Server server(&game);
-        while (true) {
-//            game.flush();
-//
-//            game.input();
-//            game.logic();
-//            game.draw();
-//            usleep(TICK);
-            server.keepConnection();
-        }
+        thread serverThread (server.keepConnection, &game);
+
     } else {
         Client client;
-        while (true) {
-//            game.flush();
-//            game.input();
-//            game.logic();
-//            game.draw();
-//            usleep(TICK);
-            client.keepConnection();
-        }
+
+        thread clientThread (client.keepConnection, &game);
+    }
+
+    while (true) {
+        game.flush();
+
+        game.input();
+        game.logic();
+        game.draw();
+        usleep(TICK);
     }
 
 
