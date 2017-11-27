@@ -16,10 +16,10 @@ using namespace std;
 
 
 //constants
-constexpr int LEFT = 65;
-constexpr int RIGHT = 66;
-constexpr int UP = 68;
-constexpr int DOWN = 67;
+constexpr int UP = 65;
+constexpr int DOWN = 66;
+constexpr int LEFT = 68;
+constexpr int RIGHT = 67;
 
 int TICK = 200000;
 
@@ -54,7 +54,7 @@ public:
     Server(GameBoard*);
     GameBoard* gameBoard;
     void keepConnection();
-    char str[100];
+    char str;
     int listen_fd;
     int comm_fd;
     struct sockaddr_in servaddr;
@@ -63,7 +63,6 @@ public:
 Server::Server(GameBoard* game) {
     this->gameBoard = game;
     this->listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-//    setSocketBlockingEnabled(this->listen_fd, false);
 
     bzero( &this->servaddr, sizeof(this->servaddr));
 
@@ -79,30 +78,34 @@ Server::Server(GameBoard* game) {
 }
 
 void Server::keepConnection() {
+    cbreak();
+    noecho();
+    nodelay(stdscr, true);
+    scrollok(stdscr, false);
     while (true) {
-        bzero(str, 100);
-
-        read(this->comm_fd, str, 100);
-
-        printf("Echoing back - %s", str);
-
-        write(this->comm_fd, str, strlen(str) + 1);
-
+        read(this->comm_fd, &this->str, 1);
+        if (this->str != '0') {
+            addch(this->str);
+            write(this->comm_fd, &this->str, 1);
+            this->str = '0';
+            refresh();
+        }
     }
 }
 
 class Client {
 public:
-    Client();
-    void keepConnection(GameBoard* game);
+    Client(GameBoard*);
+    GameBoard* game;
+    void keepConnection();
     int sockfd;
     int n;
     char sendline;
-    char recvline[100];
+    char recvline;
     struct sockaddr_in servaddr;
 };
 
-Client::Client() {
+Client::Client(GameBoard* game) {
     this->sockfd=socket(AF_INET,SOCK_STREAM,0);
 //    setSocketBlockingEnabled(this->sockfd, false);
     bzero(&this->servaddr,sizeof this->servaddr);
@@ -115,25 +118,58 @@ Client::Client() {
     connect(this->sockfd,(struct sockaddr *)&this->servaddr,sizeof(this->servaddr));
 }
 
-void Client::keepConnection(GameBoard* game) {
+void Client::keepConnection() {
     cbreak();
     noecho();
     nodelay(stdscr, true);
     scrollok(stdscr, false);
+    this->sendline = '0';
     while(true) {
-        if (kbhit()) {
-            if (getch() == 27){
-                getch();
-                this->sendline = (char)getch();
-            }
-            refresh();
-        } else {
-            refresh();
-        }
 
-        write(this->sockfd, &this->sendline, 1);
-        read(this->sockfd, this->recvline,100);
-        printf("%s", this->recvline);
+        if (kbhit()) {
+            if (getch() == 27) {
+
+                printw("YEAAAH");
+                getch();
+                switch(getch()) {
+                    case UP:
+                        printw("YEAAAH DO GOOORYYYYY");
+                        this->sendline = 'u';
+                        break;
+                    case DOWN:
+
+                        printw("YEAAAH DO NA DOOLL");
+
+                        this->sendline = 'd';
+                        break;
+
+                    case LEFT:
+
+                        printw("YEAAAH DO LEWEGO");
+
+                        this->sendline = 'l';
+                        break;
+
+                    case RIGHT:
+
+                        printw("YEAAAH DO PRAWEGOO");
+
+                        this->sendline = 'r';
+                        break;
+                }
+            }
+        }
+        if (this->sendline != '0') {
+            write(this->sockfd, &this->sendline, 1);
+            read(this->sockfd, &this->recvline, 1);
+            if (this->sendline == this->recvline) {
+                this->sendline = '0';
+                printw(&this->recvline);
+                this->recvline = '0';
+
+                refresh();
+            }
+        }
     }
 }
 
@@ -249,7 +285,7 @@ void GameBoard::input() {
     nodelay(stdscr, true);
     scrollok(stdscr, false);
     if (kbhit()) {
-        if (getch() == 27){
+        if (getch() == 27) {
             getch();
             switch(getch()) {
                 case UP:
@@ -285,7 +321,6 @@ void GameBoard::input() {
         refresh();
     } else {
         refresh();
-//        sleep(1);
     }
 }
 
@@ -413,8 +448,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-
-//    initscr();
+    initscr();
 
     GameBoard game(20);
 //    game.spawn_snake();
@@ -422,25 +456,22 @@ int main(int argc, char* argv[]) {
 
     if (gamemode == 1) {
         Server server(&game);
-        thread serverThread (server.keepConnection, &game);
+        thread serverThread(&Server::keepConnection, server);
+        serverThread.join();
 
     } else {
-        Client client;
-
-        thread clientThread (client.keepConnection, &game);
+        Client client(&game);
+        thread clientThread (&Client::keepConnection, client);
+        clientThread.join();
     }
 
-    while (true) {
-        game.flush();
-
-        game.input();
-        game.logic();
-        game.draw();
-        usleep(TICK);
-    }
-
-
-
+//    while (true) {
+//        game.flush();
+//        game.input();
+//        game.logic();
+//        game.draw();
+//        usleep(TICK);
+//    }
 
 
     return 0;
